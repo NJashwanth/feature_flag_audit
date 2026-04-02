@@ -62,7 +62,8 @@ final class AuditScanResult {
   final List<AuditUnresolvedReference> unresolvedReferences;
 
   List<String> get usedKeys {
-    final keys = findings.map((finding) => finding.key).toSet().toList()..sort();
+    final keys = findings.map((finding) => finding.key).toSet().toList()
+      ..sort();
     return List.unmodifiable(keys);
   }
 
@@ -103,17 +104,18 @@ final class AuditScanResult {
         }
         final sortedKeys = grouped.keys.toList()..sort();
         for (final key in sortedKeys) {
-          final matches = grouped[key]!..sort((left, right) {
-            final fileCompare = left.filePath.compareTo(right.filePath);
-            if (fileCompare != 0) {
-              return fileCompare;
-            }
-            final lineCompare = left.line.compareTo(right.line);
-            if (lineCompare != 0) {
-              return lineCompare;
-            }
-            return left.column.compareTo(right.column);
-          });
+          final matches = grouped[key]!
+            ..sort((left, right) {
+              final fileCompare = left.filePath.compareTo(right.filePath);
+              if (fileCompare != 0) {
+                return fileCompare;
+              }
+              final lineCompare = left.line.compareTo(right.line);
+              if (lineCompare != 0) {
+                return lineCompare;
+              }
+              return left.column.compareTo(right.column);
+            });
           lines.add('  $key (${matches.length})');
           for (final match in matches) {
             final relativePath = p.relative(match.filePath, from: projectRoot);
@@ -226,8 +228,8 @@ Future<List<String>> _collectDartFiles({
       continue;
     }
 
-    await for (final entity
-        in Directory(resolvedIncludePath).list(recursive: true, followLinks: false)) {
+    await for (final entity in Directory(resolvedIncludePath)
+        .list(recursive: true, followLinks: false)) {
       if (entity is! File) {
         continue;
       }
@@ -247,11 +249,13 @@ bool _isDartFile(String path) => path.endsWith('.dart');
 
 bool _isExcluded(String path, String projectRoot, List<String> excludePaths) {
   final normalizedPath = p.normalize(path);
-  final relativePath = p.normalize(p.relative(normalizedPath, from: projectRoot));
+  final relativePath =
+      p.normalize(p.relative(normalizedPath, from: projectRoot));
 
   for (final excludePath in excludePaths) {
     final normalizedExcludePath = p.normalize(excludePath);
-    final resolvedExcludePath = _resolvePath(projectRoot, normalizedExcludePath);
+    final resolvedExcludePath =
+        _resolvePath(projectRoot, normalizedExcludePath);
     final normalizedResolvedExcludePath = p.normalize(resolvedExcludePath);
 
     if (normalizedPath == normalizedResolvedExcludePath ||
@@ -283,7 +287,8 @@ void _extractKeyDefinitions({
   for (final className in keyClasses) {
     var searchOffset = 0;
     while (searchOffset < source.length) {
-      final classMatch = RegExp('class\\s+$className\\b[^\\{]*\\{').matchAsPrefix(
+      final classMatch =
+          RegExp('class\\s+$className\\b[^\\{]*\\{').matchAsPrefix(
         source,
         searchOffset,
       );

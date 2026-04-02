@@ -18,10 +18,12 @@ void main() {
       }
     });
 
-    test('scans included Dart files and resolves configured key classes', () async {
+    test('scans included Dart files and resolves configured key classes',
+        () async {
       final libDir = Directory(p.join(tempDir.path, 'lib'));
       await libDir.create(recursive: true);
-      await File(p.join(libDir.path, 'remote_config_keys.dart')).writeAsString('''
+      await File(p.join(libDir.path, 'remote_config_keys.dart'))
+          .writeAsString('''
 class RemoteConfigKeys {
   static const welcomeMessage = 'welcome_message';
   static const boolFlag = 'new_checkout_enabled';

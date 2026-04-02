@@ -1,7 +1,15 @@
 name: feature_flag_audit
 description: CLI tool to audit feature flags and Firebase Remote Config usage in Flutter apps.
 version: 1.0.0
-publish_to: none
+homepage: https://github.com/NJashwanth/feature_flag_audit
+repository: https://github.com/NJashwanth/feature_flag_audit
+issue_tracker: https://github.com/NJashwanth/feature_flag_audit/issues
+topics:
+  - flutter
+  - feature-flags
+  - firebase-remote-config
+  - cli
+  - static-analysis
 
 environment:
   sdk: ^3.5.0
