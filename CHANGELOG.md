@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0
+## 1.1.1
 
 - Added Firebase Remote Config console comparison using `project_id` and `service_account_path`.
 - Added key diff reporting for shared, console-only, and code-only keys.
