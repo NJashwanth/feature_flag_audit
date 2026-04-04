@@ -6,10 +6,5 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
-  flutter:
-    sdk: flutter
   feature_flag_audit:
     path: ..
-
-flutter:
-  uses-material-design: true

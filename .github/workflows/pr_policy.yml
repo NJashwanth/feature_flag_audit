@@ -2,9 +2,18 @@ name: PR Policy
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
     branches:
       - main
   pull_request_review:
+    types:
+      - submitted
+      - edited
+      - dismissed
     branches:
       - main
 
@@ -23,6 +32,7 @@ jobs:
           fetch-depth: 0
 
       - name: Validate pubspec version bump
+        if: ${{ github.event_name == 'pull_request' }}
         env:
           BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
