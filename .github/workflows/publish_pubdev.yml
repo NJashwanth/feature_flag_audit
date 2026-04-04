@@ -2,8 +2,8 @@ name: Publish to pub.dev
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       publish:
@@ -19,6 +19,7 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: pubdev
 
     steps:
       - name: Checkout
@@ -30,7 +31,7 @@ jobs:
         run: |
           set -euo pipefail
           should_publish="false"
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
             should_publish="true"
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.publish }}" == "true" ]]; then
             should_publish="true"
@@ -38,7 +39,7 @@ jobs:
           echo "should_publish=$should_publish" >> "$GITHUB_OUTPUT"
           if [[ "$should_publish" == "true" ]]; then
             if [[ "${{ github.event_name }}" == "push" ]]; then
-              echo "Automatic publish mode enabled for main branch."
+              echo "Automatic publish mode enabled for tag push."
             else
               echo "Manual publish mode enabled."
             fi
@@ -97,13 +98,8 @@ jobs:
           fi
 
       - name: Restore pub.dev credentials
-        if: ${{ steps.mode.outputs.should_publish == 'true' && steps.version_check.outputs.already_published == 'false' }}
-        env:
-          PUB_CREDENTIALS_B64: ${{ secrets.PUB_CREDENTIALS_B64 }}
-        run: |
-          set -euo pipefail
-          mkdir -p "$HOME/.config/dart"
-          echo "$PUB_CREDENTIALS_B64" | base64 --decode > "$HOME/.config/dart/pub-credentials.json"
+        if: ${{ false }}
+        run: echo "Not used with Trusted Publishing"
 
       - name: Publish package
         if: ${{ steps.mode.outputs.should_publish == 'true' && steps.version_check.outputs.already_published == 'false' }}
