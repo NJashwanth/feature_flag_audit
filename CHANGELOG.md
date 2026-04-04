@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0
+
+- Added Firebase Remote Config console comparison using `project_id` and `service_account_path`.
+- Added key diff reporting for shared, console-only, and code-only keys.
+- Added graceful fallback when Firebase fetch fails so code scanning still completes.
+- Added `--project-root` CLI option to audit projects outside the current working directory.
+- Improved public API Dartdoc coverage for better pub.dev scoring.
+- Reworked the example into a realistic Flutter-style sample directly under `example/`.
+- Added and documented sample config, dummy service account file, and sample source files for detection.
+- Updated README with Firebase console comparison setup, behavior, and usage examples.
+
 ## 1.0.0
 
 - Initial release of `feature_flag_audit`.

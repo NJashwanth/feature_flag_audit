@@ -85,6 +85,7 @@ feature_flag_audit:
 ## CLI Options
 
 ```text
+--project-root      Target project root. Defaults to current directory
 --project-id        Override firebase.project_id from YAML
 --service-account   Override firebase.service_account_path from YAML
 -h, --help          Show usage
@@ -96,12 +97,54 @@ Example:
 dart run feature_flag_audit --project-id=my-project --service-account=./service-account.json
 ```
 
+Audit another project directory from your current location:
+
+```bash
+dart run feature_flag_audit --project-root=example
+```
+
 ## Validation Rules
 
 - Uses defaults when config file is missing
 - Warns when Firebase is fully omitted (scan-only mode)
 - Fails when Firebase config is partially defined but required fields are missing
 - Fails when `service_account_path` does not exist
+
+## Firebase Console Comparison
+
+When `firebase.project_id` and `firebase.service_account_path` are provided,
+the CLI also fetches Firebase Remote Config keys from your project and compares
+them with keys detected in code.
+
+It reports:
+
+- shared keys (present in both code and Firebase)
+- console-only keys (defined in Firebase but not used in code)
+- code-only keys (used in code but missing in Firebase)
+
+### Required setup
+
+1. Create a service account in Google Cloud for the same Firebase project.
+2. Grant permissions that allow reading Firebase Remote Config templates.
+3. Download the JSON key file and set it as `service_account_path`.
+4. Set the correct `project_id` in `feature_flag_audit.yaml`.
+
+### Behavior when Firebase is unavailable
+
+- Code scan still runs and produces usage results.
+- Firebase comparison is skipped with a clear warning if:
+  - the credentials are invalid,
+  - the project id is wrong,
+  - or the API call fails.
+
+### Example
+
+```bash
+dart run feature_flag_audit \
+  --project-root=. \
+  --project-id=your-project-id \
+  --service-account=./service-account.json
+```
 
 ## Future-Friendly Design
 

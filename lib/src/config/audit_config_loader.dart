@@ -7,9 +7,12 @@ import 'package:yaml/yaml.dart';
 import 'audit_config.dart';
 import 'config_issue.dart';
 
+/// Logger callback used during configuration loading.
 typedef ConfigLogger = void Function(String message);
 
+/// Result of loading and validating configuration.
 final class AuditConfigLoadResult {
+  /// Creates a loading result.
   const AuditConfigLoadResult({
     required this.config,
     required this.configFile,
@@ -17,15 +20,25 @@ final class AuditConfigLoadResult {
     required this.loadedFromFile,
   });
 
+  /// Final merged configuration.
   final AuditConfig config;
+
+  /// The expected config file location.
   final File configFile;
+
+  /// Validation output for [config].
   final ConfigValidationResult validation;
+
+  /// Whether config was loaded from disk.
   final bool loadedFromFile;
 }
 
+/// Loads and validates `feature_flag_audit.yaml` from a project root.
 final class AuditConfigLoader {
+  /// Default configuration file name.
   static const fileName = 'feature_flag_audit.yaml';
 
+  /// Loads configuration from disk, applies CLI overrides, and validates it.
   static Future<AuditConfigLoadResult> load({
     required String projectRoot,
     String? projectIdOverride,

@@ -1,0 +1,31 @@
+feature_flag_audit:
+  firebase:
+    project_id: "sample-firebase-project"
+    service_account_path: "./service-account.json"
+
+  scan:
+    include:
+      - lib
+    exclude:
+      - build
+      - .dart_tool
+
+  detection:
+    usage_methods:
+      - getBool
+      - getString
+      - getInt
+      - getDouble
+
+    wrapper_methods:
+      - boolConfigValueProvider
+      - stringConfigValueProvider
+      - intConfigValueProvider
+      - doubleConfigValueProvider
+
+    key_classes:
+      - RemoteConfigKeys
+
+  output:
+    show_used: true
+    show_summary: true

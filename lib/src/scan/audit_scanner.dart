@@ -5,12 +5,18 @@ import 'package:path/path.dart' as p;
 
 import '../config/audit_config.dart';
 
+/// Type of method match that produced a finding.
 enum AuditMatchKind {
+  /// A direct usage method call such as getBool.
   usageMethod,
+
+  /// A configured wrapper/helper method call.
   wrapperMethod,
 }
 
+/// A resolved key usage discovered in source code.
 final class AuditFinding {
+  /// Creates a scan finding.
   const AuditFinding({
     required this.key,
     required this.method,
@@ -21,16 +27,31 @@ final class AuditFinding {
     required this.argument,
   });
 
+  /// The resolved key value.
   final String key;
+
+  /// Method name that matched.
   final String method;
+
+  /// Match kind.
   final AuditMatchKind kind;
+
+  /// Absolute source file path.
   final String filePath;
+
+  /// 1-based line number.
   final int line;
+
+  /// 1-based column number.
   final int column;
+
+  /// Raw argument text that produced the key.
   final String argument;
 }
 
+/// A method match where key reference could not be resolved.
 final class AuditUnresolvedReference {
+  /// Creates an unresolved reference entry.
   const AuditUnresolvedReference({
     required this.reference,
     required this.method,
@@ -40,15 +61,28 @@ final class AuditUnresolvedReference {
     required this.column,
   });
 
+  /// Unresolved reference text (for example `ClassName.member`).
   final String reference;
+
+  /// Method name that matched.
   final String method;
+
+  /// Match kind.
   final AuditMatchKind kind;
+
+  /// Absolute source file path.
   final String filePath;
+
+  /// 1-based line number.
   final int line;
+
+  /// 1-based column number.
   final int column;
 }
 
+/// Aggregate result returned by the scanner.
 final class AuditScanResult {
+  /// Creates a scan result.
   const AuditScanResult({
     required this.projectRoot,
     required this.scannedFiles,
@@ -56,17 +90,26 @@ final class AuditScanResult {
     required this.unresolvedReferences,
   });
 
+  /// Project root used for scanning.
   final String projectRoot;
+
+  /// Absolute file paths that were scanned.
   final List<String> scannedFiles;
+
+  /// Resolved key usage findings.
   final List<AuditFinding> findings;
+
+  /// Unresolved key references.
   final List<AuditUnresolvedReference> unresolvedReferences;
 
+  /// Unique key list sorted alphabetically.
   List<String> get usedKeys {
     final keys = findings.map((finding) => finding.key).toSet().toList()
       ..sort();
     return List.unmodifiable(keys);
   }
 
+  /// Count of usages per key.
   Map<String, int> get keyUsageCounts {
     final counts = <String, int>{};
     for (final finding in findings) {
@@ -75,6 +118,7 @@ final class AuditScanResult {
     return Map.unmodifiable(counts);
   }
 
+  /// Creates user-friendly CLI output from scan results.
   String formatForCli({
     required bool showUsed,
     required bool showSummary,
@@ -144,9 +188,12 @@ final class AuditScanResult {
   }
 }
 
+/// Scanner for detecting feature flag usage in Dart code.
 final class AuditScanner {
+  /// Creates a scanner.
   const AuditScanner();
 
+  /// Scans source files in [projectRoot] using detection rules from [config].
   Future<AuditScanResult> scan({
     required String projectRoot,
     required AuditConfig config,

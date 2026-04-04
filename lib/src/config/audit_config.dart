@@ -4,7 +4,9 @@ import 'package:path/path.dart' as p;
 
 import 'config_issue.dart';
 
+/// Complete package configuration used for loading, validation, and scanning.
 final class AuditConfig {
+  /// Creates a configuration object.
   const AuditConfig({
     required this.firebase,
     required this.scan,
@@ -12,6 +14,7 @@ final class AuditConfig {
     required this.output,
   });
 
+  /// Returns package defaults used when no configuration file is present.
   factory AuditConfig.defaults() {
     return const AuditConfig(
       firebase: FirebaseConfig(),
@@ -36,11 +39,19 @@ final class AuditConfig {
     );
   }
 
+  /// Firebase-specific settings.
   final FirebaseConfig firebase;
+
+  /// File scanning settings.
   final ScanConfig scan;
+
+  /// Method and key-detection settings.
   final DetectionConfig detection;
+
+  /// Output formatting settings.
   final OutputConfig output;
 
+  /// Creates a copy with updated sections.
   AuditConfig copyWith({
     FirebaseConfig? firebase,
     ScanConfig? scan,
@@ -55,6 +66,7 @@ final class AuditConfig {
     );
   }
 
+  /// Merges values from a parsed YAML map.
   AuditConfig mergeMap(Map<Object?, Object?> values, {required String source}) {
     return copyWith(
       firebase: firebase.mergeMap(
@@ -76,6 +88,7 @@ final class AuditConfig {
     );
   }
 
+  /// Applies CLI override values over the current config.
   AuditConfig mergeCliOverrides({
     String? projectId,
     String? serviceAccountPath,
@@ -88,6 +101,9 @@ final class AuditConfig {
     );
   }
 
+  /// Validates config values for the given [projectRoot].
+  ///
+  /// If [requireFirebase] is true, firebase fields become mandatory.
   ConfigValidationResult validate({
     required String projectRoot,
     bool requireFirebase = false,
@@ -170,6 +186,7 @@ final class AuditConfig {
     return ConfigValidationResult(issues);
   }
 
+  /// Converts the config into a serializable map.
   Map<String, Object?> toMap() {
     return <String, Object?>{
       'firebase': firebase.toMap(),
@@ -183,15 +200,21 @@ final class AuditConfig {
   String toString() => toMap().toString();
 }
 
+/// Firebase project and credential configuration.
 final class FirebaseConfig {
+  /// Creates firebase settings.
   const FirebaseConfig({
     this.projectId,
     this.serviceAccountPath,
   });
 
+  /// Firebase project identifier.
   final String? projectId;
+
+  /// Path to the service account json file.
   final String? serviceAccountPath;
 
+  /// Creates a copy with optional updates.
   FirebaseConfig copyWith({
     String? projectId,
     String? serviceAccountPath,
@@ -202,6 +225,7 @@ final class FirebaseConfig {
     );
   }
 
+  /// Merges values from a parsed map.
   FirebaseConfig mergeMap(Map<Object?, Object?> values,
       {required String source}) {
     return copyWith(
@@ -212,6 +236,7 @@ final class FirebaseConfig {
     );
   }
 
+  /// Converts this section to a map.
   Map<String, Object?> toMap() {
     return <String, Object?>{
       'project_id': projectId,
@@ -220,15 +245,21 @@ final class FirebaseConfig {
   }
 }
 
+/// Controls which source paths are included or excluded.
 final class ScanConfig {
+  /// Creates scan settings.
   const ScanConfig({
     required this.include,
     required this.exclude,
   });
 
+  /// Relative paths or files to scan.
   final List<String> include;
+
+  /// Relative paths or files to skip.
   final List<String> exclude;
 
+  /// Creates a copy with optional updates.
   ScanConfig copyWith({
     List<String>? include,
     List<String>? exclude,
@@ -239,6 +270,7 @@ final class ScanConfig {
     );
   }
 
+  /// Merges values from a parsed map.
   ScanConfig mergeMap(Map<Object?, Object?> values, {required String source}) {
     return copyWith(
       include: _readStringList(values, 'include', source: source) ?? include,
@@ -246,6 +278,7 @@ final class ScanConfig {
     );
   }
 
+  /// Converts this section to a map.
   Map<String, Object?> toMap() {
     return <String, Object?>{
       'include': include,
@@ -254,17 +287,25 @@ final class ScanConfig {
   }
 }
 
+/// Controls method and key class detection rules.
 final class DetectionConfig {
+  /// Creates detection settings.
   const DetectionConfig({
     required this.usageMethods,
     required this.wrapperMethods,
     required this.keyClasses,
   });
 
+  /// Methods called directly on a remote config instance.
   final List<String> usageMethods;
+
+  /// Wrapper helper methods that accept keys.
   final List<String> wrapperMethods;
+
+  /// Classes that define static const key members.
   final List<String> keyClasses;
 
+  /// Creates a copy with optional updates.
   DetectionConfig copyWith({
     List<String>? usageMethods,
     List<String>? wrapperMethods,
@@ -277,6 +318,7 @@ final class DetectionConfig {
     );
   }
 
+  /// Merges values from a parsed map.
   DetectionConfig mergeMap(Map<Object?, Object?> values,
       {required String source}) {
     return copyWith(
@@ -290,6 +332,7 @@ final class DetectionConfig {
     );
   }
 
+  /// Converts this section to a map.
   Map<String, Object?> toMap() {
     return <String, Object?>{
       'usage_methods': usageMethods,
@@ -299,15 +342,21 @@ final class DetectionConfig {
   }
 }
 
+/// Controls CLI output sections.
 final class OutputConfig {
+  /// Creates output settings.
   const OutputConfig({
     required this.showUsed,
     required this.showSummary,
   });
 
+  /// Whether to print per-key usage details.
   final bool showUsed;
+
+  /// Whether to print summary totals.
   final bool showSummary;
 
+  /// Creates a copy with optional updates.
   OutputConfig copyWith({
     bool? showUsed,
     bool? showSummary,
@@ -318,6 +367,7 @@ final class OutputConfig {
     );
   }
 
+  /// Merges values from a parsed map.
   OutputConfig mergeMap(Map<Object?, Object?> values,
       {required String source}) {
     return copyWith(
@@ -327,6 +377,7 @@ final class OutputConfig {
     );
   }
 
+  /// Converts this section to a map.
   Map<String, Object?> toMap() {
     return <String, Object?>{
       'show_used': showUsed,

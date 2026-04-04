@@ -6,6 +6,11 @@ import 'package:feature_flag_audit/feature_flag_audit.dart';
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
     ..addOption(
+      'project-root',
+      help:
+          'Path to the target Flutter project root. Defaults to current directory.',
+    )
+    ..addOption(
       'project-id',
       help: 'Override firebase.project_id from feature_flag_audit.yaml.',
     )
@@ -32,14 +37,19 @@ Future<void> main(List<String> arguments) async {
   }
 
   if (args['help'] as bool) {
-    stdout.writeln('feature_flag_audit v1.0.0');
+    stdout.writeln('feature_flag_audit v1.1.0');
     stdout.writeln(parser.usage);
     return;
   }
 
   try {
+    final projectRoot =
+        (args['project-root'] as String?)?.trim().isNotEmpty == true
+            ? args['project-root'] as String
+            : Directory.current.path;
+
     final result = await AuditConfigLoader.load(
-      projectRoot: Directory.current.path,
+      projectRoot: projectRoot,
       projectIdOverride: args['project-id'] as String?,
       serviceAccountPathOverride: args['service-account'] as String?,
       infoLogger: stdout.writeln,
@@ -55,7 +65,7 @@ Future<void> main(List<String> arguments) async {
     }
 
     final scanResult = await const AuditScanner().scan(
-      projectRoot: Directory.current.path,
+      projectRoot: projectRoot,
       config: result.config,
     );
 
@@ -69,6 +79,38 @@ Future<void> main(List<String> arguments) async {
     if (formattedOutput.isNotEmpty) {
       stdout.writeln('');
       stdout.writeln(formattedOutput);
+    }
+
+    final firebaseProjectId = result.config.firebase.projectId;
+    final firebaseServiceAccountPath =
+        result.config.firebase.serviceAccountPath;
+    final shouldCompareWithConsole = firebaseProjectId != null &&
+        firebaseProjectId.isNotEmpty &&
+        firebaseServiceAccountPath != null &&
+        firebaseServiceAccountPath.isNotEmpty;
+
+    if (shouldCompareWithConsole) {
+      stdout.writeln('');
+      stdout.writeln('Fetching Firebase Remote Config template...');
+      try {
+        final consoleKeys =
+            await const FirebaseRemoteConfigClient().fetchParameterKeys(
+          projectId: firebaseProjectId,
+          serviceAccountPath: firebaseServiceAccountPath,
+          projectRoot: projectRoot,
+        );
+
+        final comparison = AuditKeyComparison.compare(
+          consoleKeys: consoleKeys.toSet(),
+          codeKeys: scanResult.usedKeys.toSet(),
+        );
+        stdout.writeln(comparison.formatForCli(
+            showDetails: result.config.output.showUsed));
+      } on AuditConfigException catch (error) {
+        stderr.writeln('Firebase comparison skipped: ${error.message}');
+      } catch (error) {
+        stderr.writeln('Firebase comparison skipped: $error');
+      }
     }
   } on AuditConfigException catch (error) {
     stderr.writeln(error.message);
