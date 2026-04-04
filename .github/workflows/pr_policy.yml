@@ -40,6 +40,24 @@ jobs:
 
           git fetch origin "$BASE_REF" --depth=1
 
+          # Enforce version bump only when package-impacting files change.
+          changed_files=$(git diff --name-only "origin/$BASE_REF"...HEAD)
+          should_enforce="false"
+          while IFS= read -r file; do
+            [[ -z "$file" ]] && continue
+            case "$file" in
+              pubspec.yaml|lib/*|lib/**|bin/*|bin/**)
+                should_enforce="true"
+                break
+                ;;
+            esac
+          done <<< "$changed_files"
+
+          if [[ "$should_enforce" != "true" ]]; then
+            echo "No package-impacting changes detected. Skipping version bump enforcement."
+            exit 0
+          fi
+
           head_version=$(awk '/^version:/ { print $2; exit }' pubspec.yaml)
           base_version=$(git show "origin/$BASE_REF:pubspec.yaml" | awk '/^version:/ { print $2; exit }')
           if [[ -z "$head_version" || -z "$base_version" ]]; then
