@@ -17,7 +17,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.TAG_PUSH_TOKEN }}
 
       - name: Create or verify version tag from pubspec
         run: |
