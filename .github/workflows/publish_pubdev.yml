@@ -1,11 +1,9 @@
 name: Publish to pub.dev
 
 on:
-  workflow_run:
-    workflows:
-      - Tag Release
-    types:
-      - completed
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       publish:
@@ -16,19 +14,16 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: pubdev
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Decide publish mode
         id: mode
@@ -36,9 +31,9 @@ jobs:
         run: |
           set -euo pipefail
           should_publish="false"
-          if [[ "${{ github.event_name }}" == "workflow_run" && "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
             should_publish="true"
-            echo "Automatic publish mode enabled via Tag Release workflow."
+            echo "Automatic publish mode enabled for main branch."
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.publish }}" == "true" ]]; then
             should_publish="true"
             echo "Manual publish mode enabled."
@@ -98,8 +93,13 @@ jobs:
           fi
 
       - name: Restore pub.dev credentials
-        if: ${{ false }}
-        run: echo "Not used with Trusted Publishing"
+        if: ${{ steps.mode.outputs.should_publish == 'true' && steps.version_check.outputs.already_published == 'false' }}
+        env:
+          PUB_CREDENTIALS_B64: ${{ secrets.PUB_CREDENTIALS_B64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.config/dart"
+          echo "$PUB_CREDENTIALS_B64" | base64 --decode > "$HOME/.config/dart/pub-credentials.json"
 
       - name: Publish package
         if: ${{ steps.mode.outputs.should_publish == 'true' && steps.version_check.outputs.already_published == 'false' }}
