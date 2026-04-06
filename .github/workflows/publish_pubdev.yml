@@ -1,11 +1,9 @@
 name: Publish to pub.dev
 
 on:
-  workflow_run:
-    workflows:
-      - Tag Release
-    types:
-      - completed
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       publish:
@@ -22,13 +20,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: pubdev
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Decide publish mode
         id: mode
@@ -36,9 +33,9 @@ jobs:
         run: |
           set -euo pipefail
           should_publish="false"
-          if [[ "${{ github.event_name }}" == "workflow_run" && "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
             should_publish="true"
-            echo "Automatic publish mode enabled via Tag Release workflow."
+            echo "Automatic publish mode enabled for tag push."
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.publish }}" == "true" ]]; then
             should_publish="true"
             echo "Manual publish mode enabled."
