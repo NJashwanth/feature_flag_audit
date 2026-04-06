@@ -37,7 +37,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   if (args['help'] as bool) {
-    stdout.writeln('feature_flag_audit v1.1.1');
+    stdout.writeln('feature_flag_audit v1.1.2');
     stdout.writeln(parser.usage);
     return;
   }
@@ -64,13 +64,12 @@ Future<void> main(List<String> arguments) async {
       return;
     }
 
+    stdout.writeln('Configuration ready.');
+
     final scanResult = await const AuditScanner().scan(
       projectRoot: projectRoot,
       config: result.config,
     );
-
-    stdout.writeln('Configuration ready.');
-    stdout.writeln(result.config.toMap());
 
     final formattedOutput = scanResult.formatForCli(
       showUsed: result.config.output.showUsed,
