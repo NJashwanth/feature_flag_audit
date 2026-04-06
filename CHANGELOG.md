@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- Improved CLI output format for cleaner, more readable results.
+
 ## 1.1.1
 
 - Added Firebase Remote Config console comparison using `project_id` and `service_account_path`.
