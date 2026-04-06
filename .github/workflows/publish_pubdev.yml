@@ -1,9 +1,11 @@
 name: Publish to pub.dev
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows:
+      - Tag Release
+    types:
+      - completed
   workflow_dispatch:
     inputs:
       publish:
@@ -20,10 +22,13 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     environment: pubdev
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Decide publish mode
         id: mode
@@ -31,21 +36,16 @@ jobs:
         run: |
           set -euo pipefail
           should_publish="false"
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_run" && "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
             should_publish="true"
+            echo "Automatic publish mode enabled via Tag Release workflow."
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.publish }}" == "true" ]]; then
             should_publish="true"
-          fi
-          echo "should_publish=$should_publish" >> "$GITHUB_OUTPUT"
-          if [[ "$should_publish" == "true" ]]; then
-            if [[ "${{ github.event_name }}" == "push" ]]; then
-              echo "Automatic publish mode enabled for tag push."
-            else
-              echo "Manual publish mode enabled."
-            fi
+            echo "Manual publish mode enabled."
           else
             echo "Validation-only mode (no pub.dev publish)."
           fi
+          echo "should_publish=$should_publish" >> "$GITHUB_OUTPUT"
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
