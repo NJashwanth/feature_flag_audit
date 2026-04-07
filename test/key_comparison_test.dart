@@ -24,11 +24,32 @@ void main() {
 
       final output = comparison.formatForCli(showDetails: true);
 
-      expect(output, contains('Firebase comparison:'));
-      expect(output, contains('Console-only keys:'));
-      expect(output, contains('Code-only keys:'));
+      expect(output, contains('Firebase comparison summary:'));
+      expect(
+        output,
+        contains('Keys found in Firebase but not used in the Application:'),
+      );
+      expect(
+        output,
+        contains('keys used in the code base but not in firebase:'),
+      );
       expect(output, contains('consoleOnly'));
       expect(output, contains('codeOnly'));
+    });
+
+    test('shows None when breakdown sections are empty', () {
+      final comparison = AuditKeyComparison.compare(
+        consoleKeys: {'sharedKey'},
+        codeKeys: {'sharedKey'},
+      );
+
+      final output = comparison.formatForCli(showDetails: true);
+
+      expect(output,
+          contains('Keys found in Firebase but not used in the Application:'));
+      expect(
+          output, contains('keys used in the code base but not in firebase:'));
+      expect(output, contains('  - None'));
     });
   });
 }

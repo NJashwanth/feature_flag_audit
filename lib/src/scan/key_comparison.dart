@@ -47,31 +47,35 @@ final class AuditKeyComparison {
   /// Formats comparison details for CLI output.
   String formatForCli({bool showDetails = true}) {
     final lines = <String>[
-      'Firebase comparison:',
-      '  Console keys: ${consoleKeys.length}',
-      '  Code keys: ${codeKeys.length}',
-      '  Shared keys: ${sharedKeys.length}',
-      '  Console-only keys: ${consoleOnlyKeys.length}',
-      '  Code-only keys: ${codeOnlyKeys.length}',
+      'Firebase comparison summary:',
+      '  Keys in Firebase: ${consoleKeys.length}',
+      '  Keys in application code: ${codeKeys.length}',
+      '  Keys matched in both: ${sharedKeys.length}',
+      '  Keys only in Firebase: ${consoleOnlyKeys.length}',
+      '  Keys only in application code: ${codeOnlyKeys.length}',
     ];
 
     if (!showDetails) {
       return lines.join('\n');
     }
 
-    if (consoleOnlyKeys.isNotEmpty) {
-      lines
-        ..add('')
-        ..add('Console-only keys:');
+    lines
+      ..add('')
+      ..add('Breakdown:')
+      ..add('Keys found in Firebase but not used in the Application:');
+    if (consoleOnlyKeys.isEmpty) {
+      lines.add('  - None');
+    } else {
       for (final key in consoleOnlyKeys) {
         lines.add('  - $key');
       }
     }
 
-    if (codeOnlyKeys.isNotEmpty) {
-      lines
-        ..add('')
-        ..add('Code-only keys:');
+    lines.add('');
+    lines.add('keys used in the code base but not in firebase:');
+    if (codeOnlyKeys.isEmpty) {
+      lines.add('  - None');
+    } else {
       for (final key in codeOnlyKeys) {
         lines.add('  - $key');
       }
