@@ -37,7 +37,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   if (args['help'] as bool) {
-    stdout.writeln('feature_flag_audit v1.1.2');
+    stdout.writeln('feature_flag_audit v1.1.3');
     stdout.writeln(parser.usage);
     return;
   }

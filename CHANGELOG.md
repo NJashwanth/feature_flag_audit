@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.3
+
+- Improved Firebase comparison output with a cleaner summary section.
+- Added explicit breakdown sections for:
+	- Keys found in Firebase but not used in the Application.
+	- keys used in the code base but not in firebase.
+- Added clearer empty-state output (`None`) for comparison breakdown lists.
+
 ## 1.1.2
 
 - Improved CLI output format for cleaner, more readable results.

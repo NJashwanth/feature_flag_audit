@@ -118,9 +118,11 @@ them with keys detected in code.
 
 It reports:
 
-- shared keys (present in both code and Firebase)
-- console-only keys (defined in Firebase but not used in code)
-- code-only keys (used in code but missing in Firebase)
+- a cleaner comparison summary (counts for Firebase, code, matched, and mismatches)
+- **Keys found in Firebase but not used in the Application**
+- **keys used in the code base but not in firebase**
+
+If a breakdown section has no keys, the CLI prints `None`.
 
 ### Required setup
 
