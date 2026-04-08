@@ -45,39 +45,52 @@ final class AuditKeyComparison {
   }
 
   /// Formats comparison details for CLI output.
-  String formatForCli({bool showDetails = true}) {
-    final lines = <String>[
-      'Firebase comparison summary:',
-      '  Keys in Firebase: ${consoleKeys.length}',
-      '  Keys in application code: ${codeKeys.length}',
-      '  Keys matched in both: ${sharedKeys.length}',
-      '  Keys only in Firebase: ${consoleOnlyKeys.length}',
-      '  Keys only in application code: ${codeOnlyKeys.length}',
-    ];
+  String formatForCli({
+    bool showSummary = true,
+    bool showConsoleOnly = true,
+    bool showCodeOnly = true,
+  }) {
+    final lines = <String>[];
 
-    if (!showDetails) {
-      return lines.join('\n');
+    if (showSummary) {
+      lines
+        ..add('Firebase comparison summary:')
+        ..add('  Keys in Firebase: ${consoleKeys.length}')
+        ..add('  Keys in application code: ${codeKeys.length}')
+        ..add('  Keys matched in both: ${sharedKeys.length}')
+        ..add('  Keys only in Firebase: ${consoleOnlyKeys.length}')
+        ..add('  Keys only in application code: ${codeOnlyKeys.length}');
     }
 
-    lines
-      ..add('')
-      ..add('Breakdown:')
-      ..add('Keys found in Firebase but not used in the Application:');
-    if (consoleOnlyKeys.isEmpty) {
-      lines.add('  - None');
-    } else {
-      for (final key in consoleOnlyKeys) {
-        lines.add('  - $key');
+    if (showConsoleOnly || showCodeOnly) {
+      if (lines.isNotEmpty) {
+        lines.add('');
+      }
+      lines.add('Breakdown:');
+    }
+
+    if (showConsoleOnly) {
+      lines.add('Keys found in Firebase but not used in the Application:');
+      if (consoleOnlyKeys.isEmpty) {
+        lines.add('  - None');
+      } else {
+        for (final key in consoleOnlyKeys) {
+          lines.add('  - $key');
+        }
       }
     }
 
-    lines.add('');
-    lines.add('keys used in the code base but not in firebase:');
-    if (codeOnlyKeys.isEmpty) {
-      lines.add('  - None');
-    } else {
-      for (final key in codeOnlyKeys) {
-        lines.add('  - $key');
+    if (showCodeOnly) {
+      if (showConsoleOnly) {
+        lines.add('');
+      }
+      lines.add('keys used in the code base but not in firebase:');
+      if (codeOnlyKeys.isEmpty) {
+        lines.add('  - None');
+      } else {
+        for (final key in codeOnlyKeys) {
+          lines.add('  - $key');
+        }
       }
     }
 

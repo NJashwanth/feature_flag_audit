@@ -80,6 +80,10 @@ feature_flag_audit:
   output:
     show_used: true
     show_summary: true
+    show_unresolved_references: true
+    show_firebase_summary: true
+    show_firebase_console_only: true
+    show_firebase_code_only: true
 ```
 
 ## CLI Options
@@ -123,6 +127,15 @@ It reports:
 - **keys used in the code base but not in firebase**
 
 If a breakdown section has no keys, the CLI prints `None`.
+
+You can control exactly what is shown using the `output` flags:
+
+- `show_used`: show detected key usage breakdown from source scan
+- `show_summary`: show scan totals
+- `show_unresolved_references`: show unresolved references section
+- `show_firebase_summary`: show Firebase comparison summary totals
+- `show_firebase_console_only`: show "Keys found in Firebase but not used in the Application"
+- `show_firebase_code_only`: show "keys used in the code base but not in firebase"
 
 ### Required setup
 
