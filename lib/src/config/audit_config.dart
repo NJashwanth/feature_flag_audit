@@ -35,6 +35,10 @@ final class AuditConfig {
       output: OutputConfig(
         showUsed: true,
         showSummary: true,
+        showUnresolvedReferences: true,
+        showFirebaseSummary: true,
+        showFirebaseConsoleOnly: true,
+        showFirebaseCodeOnly: true,
       ),
     );
   }
@@ -348,6 +352,10 @@ final class OutputConfig {
   const OutputConfig({
     required this.showUsed,
     required this.showSummary,
+    required this.showUnresolvedReferences,
+    required this.showFirebaseSummary,
+    required this.showFirebaseConsoleOnly,
+    required this.showFirebaseCodeOnly,
   });
 
   /// Whether to print per-key usage details.
@@ -356,14 +364,36 @@ final class OutputConfig {
   /// Whether to print summary totals.
   final bool showSummary;
 
+  /// Whether to print unresolved key references.
+  final bool showUnresolvedReferences;
+
+  /// Whether to print Firebase comparison summary counts.
+  final bool showFirebaseSummary;
+
+  /// Whether to print Firebase-only key breakdown.
+  final bool showFirebaseConsoleOnly;
+
+  /// Whether to print code-only key breakdown.
+  final bool showFirebaseCodeOnly;
+
   /// Creates a copy with optional updates.
   OutputConfig copyWith({
     bool? showUsed,
     bool? showSummary,
+    bool? showUnresolvedReferences,
+    bool? showFirebaseSummary,
+    bool? showFirebaseConsoleOnly,
+    bool? showFirebaseCodeOnly,
   }) {
     return OutputConfig(
       showUsed: showUsed ?? this.showUsed,
       showSummary: showSummary ?? this.showSummary,
+      showUnresolvedReferences:
+          showUnresolvedReferences ?? this.showUnresolvedReferences,
+      showFirebaseSummary: showFirebaseSummary ?? this.showFirebaseSummary,
+      showFirebaseConsoleOnly:
+          showFirebaseConsoleOnly ?? this.showFirebaseConsoleOnly,
+      showFirebaseCodeOnly: showFirebaseCodeOnly ?? this.showFirebaseCodeOnly,
     );
   }
 
@@ -374,6 +404,18 @@ final class OutputConfig {
       showUsed: _readBool(values, 'show_used', source: source) ?? showUsed,
       showSummary:
           _readBool(values, 'show_summary', source: source) ?? showSummary,
+      showUnresolvedReferences:
+          _readBool(values, 'show_unresolved_references', source: source) ??
+              showUnresolvedReferences,
+      showFirebaseSummary:
+          _readBool(values, 'show_firebase_summary', source: source) ??
+              showFirebaseSummary,
+      showFirebaseConsoleOnly:
+          _readBool(values, 'show_firebase_console_only', source: source) ??
+              showFirebaseConsoleOnly,
+      showFirebaseCodeOnly:
+          _readBool(values, 'show_firebase_code_only', source: source) ??
+              showFirebaseCodeOnly,
     );
   }
 
@@ -382,6 +424,10 @@ final class OutputConfig {
     return <String, Object?>{
       'show_used': showUsed,
       'show_summary': showSummary,
+      'show_unresolved_references': showUnresolvedReferences,
+      'show_firebase_summary': showFirebaseSummary,
+      'show_firebase_console_only': showFirebaseConsoleOnly,
+      'show_firebase_code_only': showFirebaseCodeOnly,
     };
   }
 }

@@ -1,11 +1,19 @@
 # Changelog
 
+## 1.2.0
+
+- Added YAML output toggles to control what sections are shown:
+  - `show_unresolved_references`
+  - `show_firebase_summary`
+  - `show_firebase_console_only`
+  - `show_firebase_code_only`
+
 ## 1.1.3
 
 - Improved Firebase comparison output with a cleaner summary section.
 - Added explicit breakdown sections for:
-	- Keys found in Firebase but not used in the Application.
-	- keys used in the code base but not in firebase.
+- Keys found in Firebase but not used in the Application.
+- keys used in the code base but not in firebase.
 - Added clearer empty-state output (`None`) for comparison breakdown lists.
 
 ## 1.1.2

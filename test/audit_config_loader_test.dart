@@ -63,6 +63,10 @@ feature_flag_audit:
   output:
     show_used: false
     show_summary: true
+    show_unresolved_references: false
+    show_firebase_summary: true
+    show_firebase_console_only: false
+    show_firebase_code_only: true
 ''');
 
       final result = await AuditConfigLoader.load(projectRoot: tempDir.path);
@@ -74,6 +78,11 @@ feature_flag_audit:
       expect(result.config.scan.exclude, ['build']);
       expect(result.config.detection.keyClasses, ['AppRemoteConfigKeys']);
       expect(result.config.output.showUsed, isFalse);
+      expect(result.config.output.showSummary, isTrue);
+      expect(result.config.output.showUnresolvedReferences, isFalse);
+      expect(result.config.output.showFirebaseSummary, isTrue);
+      expect(result.config.output.showFirebaseConsoleOnly, isFalse);
+      expect(result.config.output.showFirebaseCodeOnly, isTrue);
     });
 
     test('cli overrides take precedence over yaml values', () async {

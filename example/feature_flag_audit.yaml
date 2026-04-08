@@ -29,3 +29,7 @@ feature_flag_audit:
   output:
     show_used: true
     show_summary: true
+    show_unresolved_references: true
+    show_firebase_summary: true
+    show_firebase_console_only: true
+    show_firebase_code_only: true

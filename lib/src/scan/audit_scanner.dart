@@ -122,6 +122,7 @@ final class AuditScanResult {
   String formatForCli({
     required bool showUsed,
     required bool showSummary,
+    required bool showUnresolvedReferences,
   }) {
     final lines = <String>[];
 
@@ -171,7 +172,7 @@ final class AuditScanResult {
       }
     }
 
-    if (unresolvedReferences.isNotEmpty) {
+    if (showUnresolvedReferences && unresolvedReferences.isNotEmpty) {
       if (lines.isNotEmpty) {
         lines.add('');
       }

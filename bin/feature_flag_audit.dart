@@ -37,7 +37,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   if (args['help'] as bool) {
-    stdout.writeln('feature_flag_audit v1.1.3');
+    stdout.writeln('feature_flag_audit v1.2.0');
     stdout.writeln(parser.usage);
     return;
   }
@@ -74,6 +74,7 @@ Future<void> main(List<String> arguments) async {
     final formattedOutput = scanResult.formatForCli(
       showUsed: result.config.output.showUsed,
       showSummary: result.config.output.showSummary,
+      showUnresolvedReferences: result.config.output.showUnresolvedReferences,
     );
     if (formattedOutput.isNotEmpty) {
       stdout.writeln('');
@@ -103,8 +104,14 @@ Future<void> main(List<String> arguments) async {
           consoleKeys: consoleKeys.toSet(),
           codeKeys: scanResult.usedKeys.toSet(),
         );
-        stdout.writeln(comparison.formatForCli(
-            showDetails: result.config.output.showUsed));
+        final comparisonOutput = comparison.formatForCli(
+          showSummary: result.config.output.showFirebaseSummary,
+          showConsoleOnly: result.config.output.showFirebaseConsoleOnly,
+          showCodeOnly: result.config.output.showFirebaseCodeOnly,
+        );
+        if (comparisonOutput.isNotEmpty) {
+          stdout.writeln(comparisonOutput);
+        }
       } on AuditConfigException catch (error) {
         stderr.writeln('Firebase comparison skipped: ${error.message}');
       } catch (error) {
