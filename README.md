@@ -2,6 +2,8 @@
 
 A Dart/Flutter CLI package to audit feature flag usage and Firebase Remote Config keys across your project.
 
+By **Jashwanth Neela** · [jneela.dev](https://jneela.dev/)
+
 It supports:
 
 - zero-config scanning out of the box
