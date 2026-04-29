@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 import 'config_issue.dart';
+import 'policy_config.dart';
 
 /// Complete package configuration used for loading, validation, and scanning.
 final class AuditConfig {
@@ -12,6 +13,7 @@ final class AuditConfig {
     required this.scan,
     required this.detection,
     required this.output,
+    required this.policy,
   });
 
   /// Returns package defaults used when no configuration file is present.
@@ -40,6 +42,11 @@ final class AuditConfig {
         showFirebaseConsoleOnly: true,
         showFirebaseCodeOnly: true,
       ),
+      policy: PolicyConfig(
+        codeOnlyKeys: PolicyAction.warn,
+        consoleOnlyKeys: PolicyAction.warn,
+        unresolvedReferences: PolicyAction.warn,
+      ),
     );
   }
 
@@ -55,18 +62,23 @@ final class AuditConfig {
   /// Output formatting settings.
   final OutputConfig output;
 
+  /// Pipeline enforcement policy settings.
+  final PolicyConfig policy;
+
   /// Creates a copy with updated sections.
   AuditConfig copyWith({
     FirebaseConfig? firebase,
     ScanConfig? scan,
     DetectionConfig? detection,
     OutputConfig? output,
+    PolicyConfig? policy,
   }) {
     return AuditConfig(
       firebase: firebase ?? this.firebase,
       scan: scan ?? this.scan,
       detection: detection ?? this.detection,
       output: output ?? this.output,
+      policy: policy ?? this.policy,
     );
   }
 
@@ -89,6 +101,10 @@ final class AuditConfig {
         _readMap(values, 'output', source: source),
         source: '$source.output',
       ),
+      policy: policy.mergeMap(
+        _readMap(values, 'policy', source: source),
+        source: '$source.policy',
+      ),
     );
   }
 
@@ -96,11 +112,19 @@ final class AuditConfig {
   AuditConfig mergeCliOverrides({
     String? projectId,
     String? serviceAccountPath,
+    PolicyAction? policyCodeOnly,
+    PolicyAction? policyConsoleOnly,
+    PolicyAction? policyUnresolved,
   }) {
     return copyWith(
       firebase: firebase.copyWith(
         projectId: projectId ?? firebase.projectId,
         serviceAccountPath: serviceAccountPath ?? firebase.serviceAccountPath,
+      ),
+      policy: policy.copyWith(
+        codeOnlyKeys: policyCodeOnly ?? policy.codeOnlyKeys,
+        consoleOnlyKeys: policyConsoleOnly ?? policy.consoleOnlyKeys,
+        unresolvedReferences: policyUnresolved ?? policy.unresolvedReferences,
       ),
     );
   }
@@ -197,6 +221,7 @@ final class AuditConfig {
       'scan': scan.toMap(),
       'detection': detection.toMap(),
       'output': output.toMap(),
+      'policy': policy.toMap(),
     };
   }
 
