@@ -19,6 +19,24 @@ Future<void> main(List<String> arguments) async {
       help:
           'Override firebase.service_account_path from feature_flag_audit.yaml.',
     )
+    ..addOption(
+      'policy-code-only',
+      help:
+          'Action when keys appear in code but are missing from Firebase (fail/warn/pass).',
+      allowed: ['fail', 'warn', 'pass'],
+    )
+    ..addOption(
+      'policy-console-only',
+      help:
+          'Action when keys exist in Firebase but are not used in code (fail/warn/pass).',
+      allowed: ['fail', 'warn', 'pass'],
+    )
+    ..addOption(
+      'policy-unresolved',
+      help:
+          'Action when key references in code cannot be resolved (fail/warn/pass).',
+      allowed: ['fail', 'warn', 'pass'],
+    )
     ..addFlag(
       'help',
       abbr: 'h',
@@ -37,7 +55,7 @@ Future<void> main(List<String> arguments) async {
   }
 
   if (args['help'] as bool) {
-    stdout.writeln('feature_flag_audit v1.2.0');
+    stdout.writeln('feature_flag_audit v1.2.1');
     stdout.writeln(parser.usage);
     return;
   }
@@ -52,6 +70,11 @@ Future<void> main(List<String> arguments) async {
       projectRoot: projectRoot,
       projectIdOverride: args['project-id'] as String?,
       serviceAccountPathOverride: args['service-account'] as String?,
+      policyCodeOnlyOverride: _parseAction(args['policy-code-only'] as String?),
+      policyConsoleOnlyOverride:
+          _parseAction(args['policy-console-only'] as String?),
+      policyUnresolvedOverride:
+          _parseAction(args['policy-unresolved'] as String?),
       infoLogger: stdout.writeln,
       warningLogger: stderr.writeln,
     );
@@ -81,6 +104,8 @@ Future<void> main(List<String> arguments) async {
       stdout.writeln(formattedOutput);
     }
 
+    AuditKeyComparison? comparison;
+
     final firebaseProjectId = result.config.firebase.projectId;
     final firebaseServiceAccountPath =
         result.config.firebase.serviceAccountPath;
@@ -100,7 +125,7 @@ Future<void> main(List<String> arguments) async {
           projectRoot: projectRoot,
         );
 
-        final comparison = AuditKeyComparison.compare(
+        comparison = AuditKeyComparison.compare(
           consoleKeys: consoleKeys.toSet(),
           codeKeys: scanResult.usedKeys.toSet(),
         );
@@ -118,8 +143,30 @@ Future<void> main(List<String> arguments) async {
         stderr.writeln('Firebase comparison skipped: $error');
       }
     }
+
+    final policyResult = evaluatePolicy(
+      policy: result.config.policy,
+      scanResult: scanResult,
+      comparison: comparison,
+    );
+
+    stdout.writeln('');
+    stdout.writeln(policyResult.formatForCli());
+
+    if (policyResult.hasFailed) {
+      exitCode = 1;
+    }
   } on AuditConfigException catch (error) {
     stderr.writeln(error.message);
     exitCode = 78;
   }
+}
+
+PolicyAction? _parseAction(String? value) {
+  return switch (value) {
+    'fail' => PolicyAction.fail,
+    'warn' => PolicyAction.warn,
+    'pass' => PolicyAction.pass,
+    _ => null,
+  };
 }

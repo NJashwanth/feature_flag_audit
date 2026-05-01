@@ -6,6 +6,7 @@ import 'package:yaml/yaml.dart';
 
 import 'audit_config.dart';
 import 'config_issue.dart';
+import 'policy_config.dart';
 
 /// Logger callback used during configuration loading.
 typedef ConfigLogger = void Function(String message);
@@ -43,6 +44,9 @@ final class AuditConfigLoader {
     required String projectRoot,
     String? projectIdOverride,
     String? serviceAccountPathOverride,
+    PolicyAction? policyCodeOnlyOverride,
+    PolicyAction? policyConsoleOnlyOverride,
+    PolicyAction? policyUnresolvedOverride,
     bool requireFirebase = false,
     ConfigLogger? infoLogger,
     ConfigLogger? warningLogger,
@@ -86,6 +90,9 @@ final class AuditConfigLoader {
     config = config.mergeCliOverrides(
       projectId: projectIdOverride,
       serviceAccountPath: serviceAccountPathOverride,
+      policyCodeOnly: policyCodeOnlyOverride,
+      policyConsoleOnly: policyConsoleOnlyOverride,
+      policyUnresolved: policyUnresolvedOverride,
     );
 
     final validation = config.validate(

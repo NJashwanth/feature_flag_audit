@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.0
+
+- Added pipeline enforcement via a new `policy` configuration section.
+- Each finding type (`code_only_keys`, `console_only_keys`, `unresolved_references`) can independently be set to `fail`, `warn`, or `pass`.
+- A `fail` rule causes the CLI to exit with code `1`, blocking the pipeline.
+- A `warn` rule prints a `[WARN]` notice but exits `0` so the pipeline continues.
+- A `pass` rule silently ignores the finding type.
+- Added three CLI flags to override policy per run without changing YAML:
+  - `--policy-code-only=fail|warn|pass`
+  - `--policy-console-only=fail|warn|pass`
+  - `--policy-unresolved=fail|warn|pass`
+- Policy check results are printed at the end of every run with a clear `Pipeline result: PASSED / FAILED` summary line.
+- All three rules default to `warn` so existing users see no behaviour change without opting in.
+
 ## 1.2.0
 
 - Added YAML output toggles to control what sections are shown:

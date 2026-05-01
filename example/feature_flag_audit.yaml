@@ -1,31 +1,43 @@
 feature_flag_audit:
+
+  # ── Firebase connection ───────────────────────────────────────────────────────
+  # When both fields are set the tool fetches live Firebase Remote Config keys
+  # and compares them against what it found in code.
+  # Leave this section out to run in scan-only mode.
   firebase:
     project_id: "sample-firebase-project"
     service_account_path: "./service-account.json"
 
+  # ── Scan paths ────────────────────────────────────────────────────────────────
   scan:
     include:
       - lib
     exclude:
       - build
       - .dart_tool
+      # lib/legacy is excluded so LegacyFlags is invisible to the scanner —
+      # this demonstrates how an unresolved reference is produced.
+      - lib/legacy
 
+  # ── Detection rules ───────────────────────────────────────────────────────────
+  # usage_methods  — calls made directly on a RemoteConfig instance
+  # wrapper_methods — your own helper functions that accept a key string
+  # key_classes     — classes that define static const key strings
   detection:
     usage_methods:
       - getBool
       - getString
       - getInt
       - getDouble
-
     wrapper_methods:
       - boolConfigValueProvider
       - stringConfigValueProvider
       - intConfigValueProvider
       - doubleConfigValueProvider
-
     key_classes:
       - RemoteConfigKeys
 
+  # ── Output sections ───────────────────────────────────────────────────────────
   output:
     show_used: true
     show_summary: true
@@ -33,3 +45,23 @@ feature_flag_audit:
     show_firebase_summary: true
     show_firebase_console_only: true
     show_firebase_code_only: true
+
+  # ── Pipeline policy ───────────────────────────────────────────────────────────
+  # Each rule accepts:  fail | warn | pass
+  #
+  #   fail  →  [FAIL] printed, exit code 1 — blocks the pipeline
+  #   warn  →  [WARN] printed, exit code 0 — advisory, pipeline continues
+  #   pass  →  silent, not evaluated at all
+  #
+  # Defaults are all `warn` if this section is omitted.
+  policy:
+    # A key used in code that doesn't exist in Firebase is almost always a bug.
+    code_only_keys: fail
+
+    # Keys in Firebase but not in code are likely stale — worth reviewing but
+    # not worth blocking a PR over.
+    console_only_keys: warn
+
+    # An unresolved reference means the key class or member wasn't found in the
+    # scanned files — this is always worth fixing.
+    unresolved_references: fail
